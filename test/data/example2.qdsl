@@ -1,0 +1,8 @@
+// Life, Universe, and Everything
+var answer = 6 + 7;
+var a = true;
+fact(3, a, answer*2);
+
+function fact(a, b) {
+	return a;
+}

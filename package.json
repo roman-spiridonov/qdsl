@@ -1,0 +1,32 @@
+{
+  "name": "qdsl",
+  "version": "0.0.1",
+  "description": "DSL for creating assessment questions in LMS",
+  "main": "index.js",
+  "scripts": {
+    "jison": "node ./node_modules/jison/lib/cli.js qdsl.y qdsl.flex -t > qdsl.output",
+    "prepare": "patch-package",
+    "test": "mocha"
+  },
+  "author": "Roman Spiridonov <romars@phystech.edu>",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-subset": "^1.6.0",
+    "debug": "^3.1.0",
+    "mocha": "^4.0.1",
+    "sinon": "^4.1.2"
+  },
+  "dependencies": {
+    "jison": "^0.4.18"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "dsl",
+    "lms",
+    "edtech",
+    "assessment"
+  ]
+}
