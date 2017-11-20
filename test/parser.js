@@ -16,11 +16,19 @@ const
   parser = require('../qdsl').parser;
 
 describe("QDSL parser", function() {
-  it("Parses simple program correctly", function() {
-    const example2 = fs.readFileSync('./test/data/example2.qdsl', {encoding: 'utf-8'});
+  it("Parses example2 (simple program) correctly", function() {
+    const file = fs.readFileSync('./test/data/example2.qdsl', {encoding: 'utf-8'});
     let expected = require('./data/example2_ast');
 
-    let res = parser.parse(example2);
+    let res = parser.parse(file);
+    expect(expected).to.eql(res);
+  });
+
+  it("Parses example1 (real use case) correctly", function() {
+    const file = fs.readFileSync('./test/data/example1.qdsl', {encoding: 'utf-8'});
+    let expected = require('./data/example1_ast');
+
+    let res = parser.parse(file);
     expect(expected).to.eql(res);
   });
 });

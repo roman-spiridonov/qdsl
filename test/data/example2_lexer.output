@@ -1,35 +1,40 @@
-2 'VAR'
-2 'ID'
-2 '='
-2 'INT_CONST'
-2 '+'
-2 'INT_CONST'
-2 ';'
-3 'VAR'
-3 'ID'
-3 '='
-3 'BOOL_CONST'
-3 ';'
-4 'ID'
-4 '('
-4 'INT_CONST'
-4 ','
-4 'ID'
-4 ','
-4 'ID'
-4 '*'
-4 'INT_CONST'
-4 ')'
-4 ';'
-6 'FUNCTION'
-6 'ID'
-6 '('
-6 'ID'
-6 ','
-6 'ID'
-6 ')'
-6 '{'
-7 'RETURN'
-7 'ID'
-7 ';'
-8 '}'
+2 VAR
+2 ID
+2 =
+2 NUM_CONST <6>
+2 +
+2 NUM_CONST <7>
+2 ;
+3 VAR
+3 ID
+3 =
+3 BOOL_CONST <true>
+3 ;
+4 VAR
+4 ID
+4 =
+4 STR_CONST <#!string>
+4 ;
+5 ID
+5 (
+5 NUM_CONST <3>
+5 ,
+5 ID
+5 ,
+5 ID
+5 *
+5 NUM_CONST <2>
+5 )
+5 ;
+7 FUNCTION
+7 ID
+7 (
+7 ID
+7 ,
+7 ID
+7 )
+7 {
+8 RETURN
+8 ID
+8 ;
+9 }

@@ -1,0 +1,356 @@
+{
+  "type": "Program",
+  "body": [
+    {
+      "type": "VariableDeclaration",
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "id": {
+            "type": "Identifier",
+            "name": "a1"
+          },
+          "init": {
+            "type": "CallExpression",
+            "callee": {
+              "type": "Identifier",
+              "name": "oneof"
+            },
+            "arguments": [
+              {
+                "type": "ObjectExpression",
+                "properties": [
+                  {
+                    "type": "Property",
+                    "key": {
+                      "type": "Literal",
+                      "value": 1,
+                      "raw": "1"
+                    },
+                    "computed": false,
+                    "value": {
+                      "type": "CallExpression",
+                      "callee": {
+                        "type": "Identifier",
+                        "name": "range"
+                      },
+                      "arguments": [
+                        {
+                          "type": "Literal",
+                          "value": 1,
+                          "raw": "1"
+                        },
+                        {
+                          "type": "Literal",
+                          "value": 2,
+                          "raw": "2"
+                        },
+                        {
+                          "type": "Literal",
+                          "value": 0.1,
+                          "raw": "0.1"
+                        }
+                      ]
+                    },
+                    "kind": "init",
+                    "method": false,
+                    "shorthand": false
+                  },
+                  {
+                    "type": "Property",
+                    "key": {
+                      "type": "Literal",
+                      "value": 2,
+                      "raw": "2"
+                    },
+                    "computed": false,
+                    "value": {
+                      "type": "Literal",
+                      "value": 3,
+                      "raw": "3"
+                    },
+                    "kind": "init",
+                    "method": false,
+                    "shorthand": false
+                  }
+                ]
+              },
+              {
+                "type": "Literal",
+                "value": "a",
+                "raw": "\"a\""
+              }
+            ]
+          }
+        }
+      ],
+      "kind": "var"
+    },
+    {
+      "type": "VariableDeclaration",
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "id": {
+            "type": "Identifier",
+            "name": "a2"
+          },
+          "init": {
+            "type": "CallExpression",
+            "callee": {
+              "type": "Identifier",
+              "name": "oneof"
+            },
+            "arguments": [
+              {
+                "type": "ObjectExpression",
+                "properties": [
+                  {
+                    "type": "Property",
+                    "key": {
+                      "type": "Literal",
+                      "value": 1,
+                      "raw": "1"
+                    },
+                    "computed": false,
+                    "value": {
+                      "type": "Literal",
+                      "value": "1",
+                      "raw": "\"1\""
+                    },
+                    "kind": "init",
+                    "method": false,
+                    "shorthand": false
+                  },
+                  {
+                    "type": "Property",
+                    "key": {
+                      "type": "Literal",
+                      "value": 2,
+                      "raw": "2"
+                    },
+                    "computed": false,
+                    "value": {
+                      "type": "Literal",
+                      "value": "2",
+                      "raw": "\"2\""
+                    },
+                    "kind": "init",
+                    "method": false,
+                    "shorthand": false
+                  }
+                ]
+              },
+              {
+                "type": "Literal",
+                "value": "a",
+                "raw": "\"a\""
+              }
+            ]
+          }
+        }
+      ],
+      "kind": "var"
+    },
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "CallExpression",
+        "callee": {
+          "type": "Identifier",
+          "name": "assert"
+        },
+        "arguments": [
+          {
+            "type": "BinaryExpression",
+            "operator": "!=",
+            "left": {
+              "type": "Identifier",
+              "name": "a1"
+            },
+            "right": {
+              "type": "Literal",
+              "value": 3,
+              "raw": "3"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "VariableDeclaration",
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "id": {
+            "type": "Identifier",
+            "name": "b"
+          },
+          "init": {
+            "type": "BinaryExpression",
+            "operator": "+",
+            "left": {
+              "type": "Identifier",
+              "name": "a1"
+            },
+            "right": {
+              "type": "Literal",
+              "value": 2,
+              "raw": "2"
+            }
+          }
+        }
+      ],
+      "kind": "var"
+    },
+    {
+      "type": "VariableDeclaration",
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "id": {
+            "type": "Identifier",
+            "name": "table"
+          },
+          "init": {
+            "type": "ObjectExpression",
+            "properties": [
+              {
+                "type": "Property",
+                "key": {
+                  "type": "Identifier",
+                  "name": "name"
+                },
+                "computed": false,
+                "value": {
+                  "type": "ArrayExpression",
+                  "elements": [
+                    {
+                      "type": "Identifier",
+                      "name": "b"
+                    }
+                  ]
+                },
+                "kind": "init",
+                "method": false,
+                "shorthand": false
+              },
+              {
+                "type": "Property",
+                "key": {
+                  "type": "Identifier",
+                  "name": "address"
+                },
+                "computed": false,
+                "value": {
+                  "type": "ArrayExpression",
+                  "elements": [
+                    {
+                      "type": "Literal",
+                      "value": "foo",
+                      "raw": "\"foo\""
+                    },
+                    {
+                      "type": "Literal",
+                      "value": "bar",
+                      "raw": "\"bar\""
+                    }
+                  ]
+                },
+                "kind": "init",
+                "method": false,
+                "shorthand": false
+              }
+            ]
+          }
+        }
+      ],
+      "kind": "var"
+    },
+    {
+      "type": "FunctionDeclaration",
+      "id": {
+        "type": "Identifier",
+        "name": "fact"
+      },
+      "params": [
+        {
+          "type": "Identifier",
+          "name": "a"
+        }
+      ],
+      "body": {
+        "type": "BlockStatement",
+        "body": [
+          {
+            "type": "IfStatement",
+            "test": {
+              "type": "BinaryExpression",
+              "operator": "<=",
+              "left": {
+                "type": "Identifier",
+                "name": "a"
+              },
+              "right": {
+                "type": "Literal",
+                "value": 1,
+                "raw": "1"
+              }
+            },
+            "consequent": {
+              "type": "BlockStatement",
+              "body": [
+                {
+                  "type": "ReturnStatement",
+                  "argument": {
+                    "type": "Literal",
+                    "value": 1,
+                    "raw": "1"
+                  }
+                }
+              ]
+            },
+            "alternate": null
+          },
+          {
+            "type": "ReturnStatement",
+            "argument": {
+              "type": "BinaryExpression",
+              "operator": "*",
+              "left": {
+                "type": "Identifier",
+                "name": "a"
+              },
+              "right": {
+                "type": "CallExpression",
+                "callee": {
+                  "type": "Identifier",
+                  "name": "fact"
+                },
+                "arguments": [
+                  {
+                    "type": "BinaryExpression",
+                    "operator": "-",
+                    "left": {
+                      "type": "Identifier",
+                      "name": "a"
+                    },
+                    "right": {
+                      "type": "Literal",
+                      "value": 1,
+                      "raw": "1"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "generator": false,
+      "expression": false,
+      "async": false
+    }
+  ],
+  "sourceType": "script"
+}

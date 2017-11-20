@@ -21,16 +21,38 @@ describe("QDSL lexer", function() {
       var lexer = parser.lexer;
       lexer.setInput(file);
 
-      let r, res = "";
+      let r, val, res = "";
       while(r = lexer.lex()) {
         if(r === 1) {
           break;
         }
-        res+=`${lexer.yylloc.first_line} '${r}'\n`;
+        val = r.search(/CONST/) !== -1 ? ` <${lexer.yytext}>` : "";
+        res += `${lexer.yylloc.first_line} ${r}${val}\n`;
       }
 
       expect(res).to.have.eql(expected);
     });
 
-    it.skip("correctly works with windows line endings");  // will fail due to jison.lexer bug
+    // jison.lexer bug was fixed manually in qdsl.flex
+    it("correctly works with windows line endings", function() {
+      let file = fs.readFileSync('./test/data/example2.qdsl', {encoding: 'utf-8'});
+      file = helpers.nix2dos(file); // prepare file
+      let expected = fs.readFileSync('./test/data/example2_lexer.output', {encoding: 'utf-8'});
+      expected = helpers.dos2nix(expected);
+
+
+      var lexer = parser.lexer;
+      lexer.setInput(file);
+
+      let r, val, res = "";
+      while(r = lexer.lex()) {
+        if(r === 1) {
+          break;
+        }
+        val = r.search(/CONST/) !== -1 ? ` <${lexer.yytext}>` : "";
+        res += `${lexer.yylloc.first_line} ${r}${val}\n`;
+      }
+
+      expect(res).to.have.eql(expected);
+    });
 });

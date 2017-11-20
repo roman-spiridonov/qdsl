@@ -47,6 +47,24 @@
       "kind": "var"
     },
     {
+      "type": "VariableDeclaration",
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "id": {
+            "type": "Identifier",
+            "name": "b"
+          },
+          "init": {
+            "type": "Literal",
+            "value": "#!string",
+            "raw": "\"#!string\""
+          }
+        }
+      ],
+      "kind": "var"
+    },
+    {
       "type": "ExpressionStatement",
       "expression": {
         "type": "CallExpression",

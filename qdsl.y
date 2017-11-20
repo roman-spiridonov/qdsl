@@ -12,7 +12,7 @@
 /* operator associations and precedence */
 %nonassoc RETURN
 %right "="
-%nonassoc LE '<' GE '>' EQ
+%nonassoc LE '<' GE '>' EQ NEQ
 %left '+' '-'
 %left '*' '/'
 %left NEG
@@ -29,18 +29,18 @@ program	: body {
 };
 
 
-body : var ';'		/* single var */
+body : var	/* single var */
     { $$ = [$1]; }
-| body var ';'	/* several vars */
+| body var /* several vars */
     { $$ = appendChild($1, $2); }
 | error ';'
 | function	/* single function*/
     { $$ = [$1]; }
 | body function	/* several functions */
     { $$ = appendChild($1, $2); }
-| expr_stmt ';'
+| expr_stmt
     { $$ = [$1]; }
-| body expr_stmt ';'
+| body expr_stmt
     { $$ = appendChild($1, $2); }
 ;
 
@@ -49,17 +49,19 @@ function : FUNCTION id '(' params ')' '{' body '}'
         body: {type: "BlockStatement", body: $7}, async: false, expression: false, generator: false}; }
 ;
 
-var	: VAR id '=' expr // '
+var	: VAR id '=' expr ';' // '
     { $$ = {type: "VariableDeclaration", kind: "var", declarations:
                 [{type: "VariableDeclarator", id: $2, "init": $4}], };
     }
 ;
 
-expr_stmt: /* empty */
+expr_stmt: ';' /* empty */
     { $$ = {type: "EmptyStatement"};  }
-| expr
+| expr ';'
     { $$ = {type: "ExpressionStatement", "expression": $1}; }
-| RETURN expr
+| if_stmt
+    { $$ = $1; }
+| RETURN expr ';'
     { $$ = {type: "ReturnStatement", "argument": $2}; }
 ;
 
@@ -113,19 +115,108 @@ expr: id '(' args ')'
     { $$ = {type: "BinaryExpression", operator: ">", "left": $1, "right": $3}; }
 | expr EQ expr
     { $$ = {type: "BinaryExpression", operator: "==", "left": $1, "right": $3}; }
+| expr NEQ expr
+    { $$ = {type: "BinaryExpression", operator: "!=", "left": $1, "right": $3}; }
 | expr '^' expr
     { $$ = {type: "BinaryExpression", operator: "^", "left": $1, "right": $3}; }
 | '-' expr %prec NEG
     { $$ = {type: "UnaryExpression", operator: "-", "argument": $2}; }
-| INT_CONST
-    { $$ = {type: "Literal", value: parseInt(yytext), raw: $1}; }
-| BOOL_CONST
-    { $$ = {type: "Literal", value: JSON.parse(yytext), raw: $1}; }
-| STR_CONST
-    { $$ = {type: "Literal", value: yytext, raw: $1}; }
+| array
+    { $$ = $1; }
+| obj
+    { $$ = $1; }
+| int
+    { $$ = $1; }
+| bool
+    { $$ = $1; }
+| string
+    { $$ = $1; }
 | id
     { $$ = $1; }
 ;
+
+if_stmt: IF '(' expr ')' '{' body '}'
+    { $$ = {type: "IfStatement", test: $3, consequent: {type: "BlockStatement", body: $6},
+            alternate: null}; }
+| IF '(' expr ')' '{' body '}' ELSE '{' body '}'
+    { $$ = {type: "IfStatement", test: $3, consequent: {type: "BlockStatement", body: $6},
+            alternate: {type: "BlockStatement", body: $10}}; }
+;
+
+int: NUM_CONST
+  { $$ = {type: "Literal", value: parseFloat(yytext), raw: $1}; }
+;
+bool: BOOL_CONST
+  { $$ = {type: "Literal", value: JSON.parse(yytext), raw: $1}; }
+;
+string: STR_CONST
+  { $$ = {type: "Literal", value: yytext, raw: "\""+$1+"\""}; }
+;
+
+array: '[' ']'
+    { $$ = {type: "ArrayExpression", elements: [] }; }
+| '[' values ']'
+    { $$ = {type: "ArrayExpression", elements: $2 }; }
+;
+
+values: value
+    { $$ = [$1]; }
+| values ',' value
+    { $$ = appendChild($1, $3); }
+;
+
+value: expr
+{
+  $$ = $1;
+};
+
+obj: '{' kv_pairs '}'
+    { $$ = {type: "ObjectExpression", "properties": $2}; }
+| '{' values '}'
+    { $$ = {type: "ObjectExpression", "properties": $2}; }
+;
+
+// {key: value, ...}
+kv_pairs: /* empty */
+    { $$ = []; }
+| kv_pairs_nonempty
+    { $$ = $1; }
+;
+
+kv_pairs_nonempty: kv_pair
+    { $$ = [$1]; }
+| kv_pairs_nonempty ',' kv_pair
+    { $$ = appendChild($1, $3); }
+;
+
+
+kv_pair: key expr
+    { $$ = {type: "Property", "key": $1, "value": $2,
+            "computed": false, "kind": "init", "method": false, "shorthand": false} }
+;
+
+key: id ':'
+  { $$ = $1; }
+| int ':'
+  { $$ = $1; }
+| string ':'
+  { $$ = $1; }
+;
+
+
+// {1, 2} -> {1: 1, 2: 2}
+set_values: set_value
+    { $$ = [$1]; }
+| set_values ',' set_value
+    { $$ = appendChild($1, $3); }
+;
+
+set_value: expr
+{
+  if(yy.key_id === null) yy.key_id = 1;
+  $$ = {type: "Property", "key": {type: "Literal", value: yy.key_id, "raw": `${yy.key_id}`}, value: $1};
+  yy.key_id++;
+};
 
 /* end of grammar */
 %%

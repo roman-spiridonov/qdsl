@@ -18,25 +18,45 @@ params(12)
 VAR(16)
 =(17)
 expr(18)
-RETURN(19)
-params_nonempty(20)
-,(21)
-ID(22)
-args(23)
-args_nonempty(24)
-+(25)
--(26)
-*(27)
-/(28)
-<(29)
-LE(30)
-GE(31)
->(32)
-EQ(33)
-^(34)
-INT_CONST(35)
-BOOL_CONST(36)
-STR_CONST(37)
+if_stmt(19)
+RETURN(20)
+params_nonempty(21)
+,(22)
+ID(23)
+args(24)
+args_nonempty(25)
++(26)
+-(27)
+*(28)
+/(29)
+<(30)
+LE(31)
+GE(32)
+>(33)
+EQ(34)
+NEQ(35)
+^(36)
+array(37)
+obj(38)
+int(39)
+bool(40)
+string(41)
+IF(42)
+ELSE(43)
+NUM_CONST(44)
+BOOL_CONST(45)
+STR_CONST(46)
+[(47)
+](48)
+values(49)
+value(50)
+kv_pairs(51)
+kv_pairs_nonempty(52)
+kv_pair(53)
+key(54)
+:(55)
+set_values(56)
+set_value(57)
 
 Item sets
 ------
@@ -44,18 +64,19 @@ Item sets
 item set 0 
 $accept -> .program $end #lookaheads= $end
 program -> .body
-body -> .var ;
-body -> .body var ;
+body -> .var
+body -> .body var
 body -> .error ;
 body -> .function
 body -> .body function
-body -> .expr_stmt ;
-body -> .body expr_stmt ;
-var -> .VAR id = expr
+body -> .expr_stmt
+body -> .body expr_stmt
+var -> .VAR id = expr ;
 function -> .FUNCTION id ( params ) { body }
-expr_stmt -> .
-expr_stmt -> .expr
-expr_stmt -> .RETURN expr
+expr_stmt -> .;
+expr_stmt -> .expr ;
+expr_stmt -> .if_stmt
+expr_stmt -> .RETURN expr ;
 expr -> .id ( args )
 expr -> .expr + expr
 expr -> .expr - expr
@@ -66,14 +87,26 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"program":1,"body":2,"var":3,"error":4,"function":5,"expr_stmt":6,"VAR":7,"FUNCTION":8,"expr":9,"RETURN":10,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+if_stmt -> .IF ( expr ) { body }
+if_stmt -> .IF ( expr ) { body } ELSE { body }
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"program":1,"body":2,"var":3,"error":4,"function":5,"expr_stmt":6,"VAR":7,"FUNCTION":8,";":9,"expr":10,"if_stmt":11,"RETURN":12,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"IF":20,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
 item set 1 
 $accept -> program .$end #lookaheads= $end 
@@ -81,14 +114,15 @@ transitions ->  {}
 
 item set 2 
 program -> body .
-body -> body .var ;
+body -> body .var
 body -> body .function
-body -> body .expr_stmt ;
-var -> .VAR id = expr
+body -> body .expr_stmt
+var -> .VAR id = expr ;
 function -> .FUNCTION id ( params ) { body }
-expr_stmt -> .
-expr_stmt -> .expr
-expr_stmt -> .RETURN expr
+expr_stmt -> .;
+expr_stmt -> .expr ;
+expr_stmt -> .if_stmt
+expr_stmt -> .RETURN expr ;
 expr -> .id ( args )
 expr -> .expr + expr
 expr -> .expr - expr
@@ -99,43 +133,59 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"var":17,"function":18,"expr_stmt":19,"VAR":7,"FUNCTION":8,"expr":9,"RETURN":10,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+if_stmt -> .IF ( expr ) { body }
+if_stmt -> .IF ( expr ) { body } ELSE { body }
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"var":27,"function":28,"expr_stmt":29,"VAR":7,"FUNCTION":8,";":9,"expr":10,"if_stmt":11,"RETURN":12,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"IF":20,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
 item set 3 
-body -> var .; 
-transitions ->  {";":20}
+body -> var . 
+transitions ->  {}
 
 item set 4 
 body -> error .; 
-transitions ->  {";":21}
+transitions ->  {";":30}
 
 item set 5 
 body -> function . 
 transitions ->  {}
 
 item set 6 
-body -> expr_stmt .; 
-transitions ->  {";":22}
+body -> expr_stmt . 
+transitions ->  {}
 
 item set 7 
-var -> VAR .id = expr
+var -> VAR .id = expr ;
 id -> .ID 
-transitions ->  {"id":23,"ID":16}
+transitions ->  {"id":31,"ID":21}
 
 item set 8 
 function -> FUNCTION .id ( params ) { body }
 id -> .ID 
-transitions ->  {"id":24,"ID":16}
+transitions ->  {"id":32,"ID":21}
 
 item set 9 
-expr_stmt -> expr .
+expr_stmt -> ; . 
+transitions ->  {}
+
+item set 10 
+expr_stmt -> expr .;
 expr -> expr .+ expr
 expr -> expr .- expr
 expr -> expr .* expr
@@ -145,11 +195,16 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {";":33,"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 10 
-expr_stmt -> RETURN .expr
+item set 11 
+expr_stmt -> if_stmt . 
+transitions ->  {}
+
+item set 12 
+expr_stmt -> RETURN .expr ;
 expr -> .id ( args )
 expr -> .expr + expr
 expr -> .expr - expr
@@ -160,21 +215,31 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"expr":35,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":45,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 11 
+item set 13 
 expr -> id .( args )
 expr -> id . 
-transitions ->  {"(":36}
+transitions ->  {"(":46}
 
-item set 12 
+item set 14 
 expr -> - .expr
 expr -> .id ( args )
 expr -> .expr + expr
@@ -186,64 +251,173 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"expr":37,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
-
-item set 13 
-expr -> INT_CONST . 
-transitions ->  {}
-
-item set 14 
-expr -> BOOL_CONST . 
-transitions ->  {}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":47,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
 item set 15 
-expr -> STR_CONST . 
+expr -> array . 
 transitions ->  {}
 
 item set 16 
-id -> ID . 
+expr -> obj . 
 transitions ->  {}
 
 item set 17 
-body -> body var .; 
-transitions ->  {";":38}
+expr -> int . 
+transitions ->  {}
 
 item set 18 
-body -> body function . 
+expr -> bool . 
 transitions ->  {}
 
 item set 19 
-body -> body expr_stmt .; 
-transitions ->  {";":39}
-
-item set 20 
-body -> var ; . 
+expr -> string . 
 transitions ->  {}
 
+item set 20 
+if_stmt -> IF .( expr ) { body }
+if_stmt -> IF .( expr ) { body } ELSE { body } 
+transitions ->  {"(":48}
+
 item set 21 
-body -> error ; . 
+id -> ID . 
 transitions ->  {}
 
 item set 22 
-body -> expr_stmt ; . 
-transitions ->  {}
+array -> [ .]
+array -> [ .values ]
+values -> .value
+values -> .values , value
+value -> .expr
+expr -> .id ( args )
+expr -> .expr + expr
+expr -> .expr - expr
+expr -> .expr * expr
+expr -> .expr / expr
+expr -> .expr < expr
+expr -> .expr LE expr
+expr -> .expr GE expr
+expr -> .expr > expr
+expr -> .expr EQ expr
+expr -> .expr NEQ expr
+expr -> .expr ^ expr
+expr -> .- expr
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
+expr -> .id
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"]":49,"values":50,"value":51,"expr":52,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
 item set 23 
-var -> VAR id .= expr 
-transitions ->  {"=":40}
+obj -> { .kv_pairs }
+obj -> { .values }
+kv_pairs -> .
+kv_pairs -> .kv_pairs_nonempty
+values -> .value
+values -> .values , value
+kv_pairs_nonempty -> .kv_pair
+kv_pairs_nonempty -> .kv_pairs_nonempty , kv_pair
+value -> .expr
+kv_pair -> .key expr
+expr -> .id ( args )
+expr -> .expr + expr
+expr -> .expr - expr
+expr -> .expr * expr
+expr -> .expr / expr
+expr -> .expr < expr
+expr -> .expr LE expr
+expr -> .expr GE expr
+expr -> .expr > expr
+expr -> .expr EQ expr
+expr -> .expr NEQ expr
+expr -> .expr ^ expr
+expr -> .- expr
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
+expr -> .id
+key -> .id :
+key -> .int :
+key -> .string :
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"kv_pairs":53,"values":54,"kv_pairs_nonempty":55,"value":51,"kv_pair":56,"expr":52,"key":57,"id":58,"-":14,"array":15,"obj":16,"int":59,"bool":18,"string":60,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
 item set 24 
-function -> FUNCTION id .( params ) { body } 
-transitions ->  {"(":41}
+int -> NUM_CONST . 
+transitions ->  {}
 
 item set 25 
+bool -> BOOL_CONST . 
+transitions ->  {}
+
+item set 26 
+string -> STR_CONST . 
+transitions ->  {}
+
+item set 27 
+body -> body var . 
+transitions ->  {}
+
+item set 28 
+body -> body function . 
+transitions ->  {}
+
+item set 29 
+body -> body expr_stmt . 
+transitions ->  {}
+
+item set 30 
+body -> error ; . 
+transitions ->  {}
+
+item set 31 
+var -> VAR id .= expr ; 
+transitions ->  {"=":61}
+
+item set 32 
+function -> FUNCTION id .( params ) { body } 
+transitions ->  {"(":62}
+
+item set 33 
+expr_stmt -> expr ; . 
+transitions ->  {}
+
+item set 34 
 expr -> expr + .expr
 expr -> .id ( args )
 expr -> .expr + expr
@@ -255,16 +429,26 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"expr":42,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":63,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 26 
+item set 35 
 expr -> expr - .expr
 expr -> .id ( args )
 expr -> .expr + expr
@@ -276,16 +460,26 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"expr":43,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":64,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 27 
+item set 36 
 expr -> expr * .expr
 expr -> .id ( args )
 expr -> .expr + expr
@@ -297,16 +491,26 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"expr":44,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":65,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 28 
+item set 37 
 expr -> expr / .expr
 expr -> .id ( args )
 expr -> .expr + expr
@@ -318,16 +522,26 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"expr":45,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":66,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 29 
+item set 38 
 expr -> expr < .expr
 expr -> .id ( args )
 expr -> .expr + expr
@@ -339,16 +553,26 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"expr":46,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":67,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 30 
+item set 39 
 expr -> expr LE .expr
 expr -> .id ( args )
 expr -> .expr + expr
@@ -360,16 +584,26 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"expr":47,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":68,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 31 
+item set 40 
 expr -> expr GE .expr
 expr -> .id ( args )
 expr -> .expr + expr
@@ -381,16 +615,26 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"expr":48,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":69,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 32 
+item set 41 
 expr -> expr > .expr
 expr -> .id ( args )
 expr -> .expr + expr
@@ -402,16 +646,26 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"expr":49,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":70,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 33 
+item set 42 
 expr -> expr EQ .expr
 expr -> .id ( args )
 expr -> .expr + expr
@@ -423,16 +677,57 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"expr":50,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":71,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 34 
+item set 43 
+expr -> expr NEQ .expr
+expr -> .id ( args )
+expr -> .expr + expr
+expr -> .expr - expr
+expr -> .expr * expr
+expr -> .expr / expr
+expr -> .expr < expr
+expr -> .expr LE expr
+expr -> .expr GE expr
+expr -> .expr > expr
+expr -> .expr EQ expr
+expr -> .expr NEQ expr
+expr -> .expr ^ expr
+expr -> .- expr
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
+expr -> .id
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":72,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
+
+item set 44 
 expr -> expr ^ .expr
 expr -> .id ( args )
 expr -> .expr + expr
@@ -444,17 +739,27 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"expr":51,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":73,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 35 
-expr_stmt -> RETURN expr .
+item set 45 
+expr_stmt -> RETURN expr .;
 expr -> expr .+ expr
 expr -> expr .- expr
 expr -> expr .* expr
@@ -464,10 +769,11 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {";":74,"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 36 
+item set 46 
 expr -> id ( .args )
 args -> .
 args -> .args_nonempty
@@ -483,16 +789,26 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"args":52,"args_nonempty":53,"expr":54,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"args":75,"args_nonempty":76,"expr":77,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 37 
+item set 47 
 expr -> - expr .
 expr -> expr .+ expr
 expr -> expr .- expr
@@ -503,19 +819,13 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 38 
-body -> body var ; . 
-transitions ->  {}
-
-item set 39 
-body -> body expr_stmt ; . 
-transitions ->  {}
-
-item set 40 
-var -> VAR id = .expr
+item set 48 
+if_stmt -> IF ( .expr ) { body }
+if_stmt -> IF ( .expr ) { body } ELSE { body }
 expr -> .id ( args )
 expr -> .expr + expr
 expr -> .expr - expr
@@ -526,25 +836,159 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"expr":55,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":78,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 41 
+item set 49 
+array -> [ ] . 
+transitions ->  {}
+
+item set 50 
+array -> [ values .]
+values -> values ., value 
+transitions ->  {"]":79,",":80}
+
+item set 51 
+values -> value . 
+transitions ->  {}
+
+item set 52 
+value -> expr .
+expr -> expr .+ expr
+expr -> expr .- expr
+expr -> expr .* expr
+expr -> expr ./ expr
+expr -> expr .< expr
+expr -> expr .LE expr
+expr -> expr .GE expr
+expr -> expr .> expr
+expr -> expr .EQ expr
+expr -> expr .NEQ expr
+expr -> expr .^ expr 
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
+
+item set 53 
+obj -> { kv_pairs .} 
+transitions ->  {"}":81}
+
+item set 54 
+obj -> { values .}
+values -> values ., value 
+transitions ->  {"}":82,",":80}
+
+item set 55 
+kv_pairs -> kv_pairs_nonempty .
+kv_pairs_nonempty -> kv_pairs_nonempty ., kv_pair 
+transitions ->  {",":83}
+
+item set 56 
+kv_pairs_nonempty -> kv_pair . 
+transitions ->  {}
+
+item set 57 
+kv_pair -> key .expr
+expr -> .id ( args )
+expr -> .expr + expr
+expr -> .expr - expr
+expr -> .expr * expr
+expr -> .expr / expr
+expr -> .expr < expr
+expr -> .expr LE expr
+expr -> .expr GE expr
+expr -> .expr > expr
+expr -> .expr EQ expr
+expr -> .expr NEQ expr
+expr -> .expr ^ expr
+expr -> .- expr
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
+expr -> .id
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":84,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
+
+item set 58 
+expr -> id .( args )
+expr -> id .
+key -> id .: 
+transitions ->  {"(":46,":":85}
+
+item set 59 
+expr -> int .
+key -> int .: 
+transitions ->  {":":86}
+
+item set 60 
+expr -> string .
+key -> string .: 
+transitions ->  {":":87}
+
+item set 61 
+var -> VAR id = .expr ;
+expr -> .id ( args )
+expr -> .expr + expr
+expr -> .expr - expr
+expr -> .expr * expr
+expr -> .expr / expr
+expr -> .expr < expr
+expr -> .expr LE expr
+expr -> .expr GE expr
+expr -> .expr > expr
+expr -> .expr EQ expr
+expr -> .expr NEQ expr
+expr -> .expr ^ expr
+expr -> .- expr
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
+expr -> .id
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":88,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
+
+item set 62 
 function -> FUNCTION id ( .params ) { body }
 params -> .
 params -> .params_nonempty
 params_nonempty -> .id
 params_nonempty -> .params_nonempty , id
 id -> .ID 
-transitions ->  {"params":56,"params_nonempty":57,"id":58,"ID":16}
+transitions ->  {"params":89,"params_nonempty":90,"id":91,"ID":21}
 
-item set 42 
+item set 63 
 expr -> expr + expr .
 expr -> expr .+ expr
 expr -> expr .- expr
@@ -555,10 +999,11 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 43 
+item set 64 
 expr -> expr - expr .
 expr -> expr .+ expr
 expr -> expr .- expr
@@ -569,10 +1014,11 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 44 
+item set 65 
 expr -> expr * expr .
 expr -> expr .+ expr
 expr -> expr .- expr
@@ -583,10 +1029,11 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 45 
+item set 66 
 expr -> expr / expr .
 expr -> expr .+ expr
 expr -> expr .- expr
@@ -597,10 +1044,11 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 46 
+item set 67 
 expr -> expr < expr .
 expr -> expr .+ expr
 expr -> expr .- expr
@@ -611,10 +1059,11 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 47 
+item set 68 
 expr -> expr LE expr .
 expr -> expr .+ expr
 expr -> expr .- expr
@@ -625,10 +1074,11 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 48 
+item set 69 
 expr -> expr GE expr .
 expr -> expr .+ expr
 expr -> expr .- expr
@@ -639,10 +1089,11 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 49 
+item set 70 
 expr -> expr > expr .
 expr -> expr .+ expr
 expr -> expr .- expr
@@ -653,10 +1104,11 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 50 
+item set 71 
 expr -> expr EQ expr .
 expr -> expr .+ expr
 expr -> expr .- expr
@@ -667,10 +1119,26 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 51 
+item set 72 
+expr -> expr NEQ expr .
+expr -> expr .+ expr
+expr -> expr .- expr
+expr -> expr .* expr
+expr -> expr ./ expr
+expr -> expr .< expr
+expr -> expr .LE expr
+expr -> expr .GE expr
+expr -> expr .> expr
+expr -> expr .EQ expr
+expr -> expr .NEQ expr
+expr -> expr .^ expr 
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
+
+item set 73 
 expr -> expr ^ expr .
 expr -> expr .+ expr
 expr -> expr .- expr
@@ -681,19 +1149,24 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 52 
+item set 74 
+expr_stmt -> RETURN expr ; . 
+transitions ->  {}
+
+item set 75 
 expr -> id ( args .)
 args_nonempty -> args ., expr 
-transitions ->  {")":59,",":60}
+transitions ->  {")":92,",":93}
 
-item set 53 
+item set 76 
 args -> args_nonempty . 
 transitions ->  {}
 
-item set 54 
+item set 77 
 args_nonempty -> expr .
 expr -> expr .+ expr
 expr -> expr .- expr
@@ -704,11 +1177,13 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 55 
-var -> VAR id = expr .
+item set 78 
+if_stmt -> IF ( expr .) { body }
+if_stmt -> IF ( expr .) { body } ELSE { body }
 expr -> expr .+ expr
 expr -> expr .- expr
 expr -> expr .* expr
@@ -718,27 +1193,125 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {")":94,"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 56 
+item set 79 
+array -> [ values ] . 
+transitions ->  {}
+
+item set 80 
+values -> values , .value
+value -> .expr
+expr -> .id ( args )
+expr -> .expr + expr
+expr -> .expr - expr
+expr -> .expr * expr
+expr -> .expr / expr
+expr -> .expr < expr
+expr -> .expr LE expr
+expr -> .expr GE expr
+expr -> .expr > expr
+expr -> .expr EQ expr
+expr -> .expr NEQ expr
+expr -> .expr ^ expr
+expr -> .- expr
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
+expr -> .id
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"value":95,"expr":52,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
+
+item set 81 
+obj -> { kv_pairs } . 
+transitions ->  {}
+
+item set 82 
+obj -> { values } . 
+transitions ->  {}
+
+item set 83 
+kv_pairs_nonempty -> kv_pairs_nonempty , .kv_pair
+kv_pair -> .key expr
+key -> .id :
+key -> .int :
+key -> .string :
+id -> .ID
+int -> .NUM_CONST
+string -> .STR_CONST 
+transitions ->  {"kv_pair":96,"key":57,"id":97,"int":98,"string":99,"ID":21,"NUM_CONST":24,"STR_CONST":26}
+
+item set 84 
+kv_pair -> key expr .
+expr -> expr .+ expr
+expr -> expr .- expr
+expr -> expr .* expr
+expr -> expr ./ expr
+expr -> expr .< expr
+expr -> expr .LE expr
+expr -> expr .GE expr
+expr -> expr .> expr
+expr -> expr .EQ expr
+expr -> expr .NEQ expr
+expr -> expr .^ expr 
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
+
+item set 85 
+key -> id : . 
+transitions ->  {}
+
+item set 86 
+key -> int : . 
+transitions ->  {}
+
+item set 87 
+key -> string : . 
+transitions ->  {}
+
+item set 88 
+var -> VAR id = expr .;
+expr -> expr .+ expr
+expr -> expr .- expr
+expr -> expr .* expr
+expr -> expr ./ expr
+expr -> expr .< expr
+expr -> expr .LE expr
+expr -> expr .GE expr
+expr -> expr .> expr
+expr -> expr .EQ expr
+expr -> expr .NEQ expr
+expr -> expr .^ expr 
+transitions ->  {";":100,"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
+
+item set 89 
 function -> FUNCTION id ( params .) { body } 
-transitions ->  {")":61}
+transitions ->  {")":101}
 
-item set 57 
+item set 90 
 params -> params_nonempty .
 params_nonempty -> params_nonempty ., id 
-transitions ->  {",":62}
+transitions ->  {",":102}
 
-item set 58 
+item set 91 
 params_nonempty -> id . 
 transitions ->  {}
 
-item set 59 
+item set 92 
 expr -> id ( args ) . 
 transitions ->  {}
 
-item set 60 
+item set 93 
 args_nonempty -> args , .expr
 expr -> .id ( args )
 expr -> .expr + expr
@@ -750,25 +1323,64 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"expr":63,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"expr":103,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 61 
+item set 94 
+if_stmt -> IF ( expr ) .{ body }
+if_stmt -> IF ( expr ) .{ body } ELSE { body } 
+transitions ->  {"{":104}
+
+item set 95 
+values -> values , value . 
+transitions ->  {}
+
+item set 96 
+kv_pairs_nonempty -> kv_pairs_nonempty , kv_pair . 
+transitions ->  {}
+
+item set 97 
+key -> id .: 
+transitions ->  {":":85}
+
+item set 98 
+key -> int .: 
+transitions ->  {":":86}
+
+item set 99 
+key -> string .: 
+transitions ->  {":":87}
+
+item set 100 
+var -> VAR id = expr ; . 
+transitions ->  {}
+
+item set 101 
 function -> FUNCTION id ( params ) .{ body } 
-transitions ->  {"{":64}
+transitions ->  {"{":105}
 
-item set 62 
+item set 102 
 params_nonempty -> params_nonempty , .id
 id -> .ID 
-transitions ->  {"id":65,"ID":16}
+transitions ->  {"id":106,"ID":21}
 
-item set 63 
+item set 103 
 args_nonempty -> args , expr .
 expr -> expr .+ expr
 expr -> expr .- expr
@@ -779,23 +1391,26 @@ expr -> expr .LE expr
 expr -> expr .GE expr
 expr -> expr .> expr
 expr -> expr .EQ expr
+expr -> expr .NEQ expr
 expr -> expr .^ expr 
-transitions ->  {"+":25,"-":26,"*":27,"/":28,"<":29,"LE":30,"GE":31,">":32,"EQ":33,"^":34}
+transitions ->  {"+":34,"-":35,"*":36,"/":37,"<":38,"LE":39,"GE":40,">":41,"EQ":42,"NEQ":43,"^":44}
 
-item set 64 
-function -> FUNCTION id ( params ) { .body }
-body -> .var ;
-body -> .body var ;
+item set 104 
+if_stmt -> IF ( expr ) { .body }
+if_stmt -> IF ( expr ) { .body } ELSE { body }
+body -> .var
+body -> .body var
 body -> .error ;
 body -> .function
 body -> .body function
-body -> .expr_stmt ;
-body -> .body expr_stmt ;
-var -> .VAR id = expr
+body -> .expr_stmt
+body -> .body expr_stmt
+var -> .VAR id = expr ;
 function -> .FUNCTION id ( params ) { body }
-expr_stmt -> .
-expr_stmt -> .expr
-expr_stmt -> .RETURN expr
+expr_stmt -> .;
+expr_stmt -> .expr ;
+expr_stmt -> .if_stmt
+expr_stmt -> .RETURN expr ;
 expr -> .id ( args )
 expr -> .expr + expr
 expr -> .expr - expr
@@ -806,29 +1421,89 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"body":66,"var":3,"error":4,"function":5,"expr_stmt":6,"VAR":7,"FUNCTION":8,"expr":9,"RETURN":10,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+if_stmt -> .IF ( expr ) { body }
+if_stmt -> .IF ( expr ) { body } ELSE { body }
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"body":107,"var":3,"error":4,"function":5,"expr_stmt":6,"VAR":7,"FUNCTION":8,";":9,"expr":10,"if_stmt":11,"RETURN":12,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"IF":20,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 65 
+item set 105 
+function -> FUNCTION id ( params ) { .body }
+body -> .var
+body -> .body var
+body -> .error ;
+body -> .function
+body -> .body function
+body -> .expr_stmt
+body -> .body expr_stmt
+var -> .VAR id = expr ;
+function -> .FUNCTION id ( params ) { body }
+expr_stmt -> .;
+expr_stmt -> .expr ;
+expr_stmt -> .if_stmt
+expr_stmt -> .RETURN expr ;
+expr -> .id ( args )
+expr -> .expr + expr
+expr -> .expr - expr
+expr -> .expr * expr
+expr -> .expr / expr
+expr -> .expr < expr
+expr -> .expr LE expr
+expr -> .expr GE expr
+expr -> .expr > expr
+expr -> .expr EQ expr
+expr -> .expr NEQ expr
+expr -> .expr ^ expr
+expr -> .- expr
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
+expr -> .id
+if_stmt -> .IF ( expr ) { body }
+if_stmt -> .IF ( expr ) { body } ELSE { body }
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"body":108,"var":3,"error":4,"function":5,"expr_stmt":6,"VAR":7,"FUNCTION":8,";":9,"expr":10,"if_stmt":11,"RETURN":12,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"IF":20,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
+
+item set 106 
 params_nonempty -> params_nonempty , id . 
 transitions ->  {}
 
-item set 66 
-function -> FUNCTION id ( params ) { body .}
-body -> body .var ;
+item set 107 
+if_stmt -> IF ( expr ) { body .}
+if_stmt -> IF ( expr ) { body .} ELSE { body }
+body -> body .var
 body -> body .function
-body -> body .expr_stmt ;
-var -> .VAR id = expr
+body -> body .expr_stmt
+var -> .VAR id = expr ;
 function -> .FUNCTION id ( params ) { body }
-expr_stmt -> .
-expr_stmt -> .expr
-expr_stmt -> .RETURN expr
+expr_stmt -> .;
+expr_stmt -> .expr ;
+expr_stmt -> .if_stmt
+expr_stmt -> .RETURN expr ;
 expr -> .id ( args )
 expr -> .expr + expr
 expr -> .expr - expr
@@ -839,19 +1514,174 @@ expr -> .expr LE expr
 expr -> .expr GE expr
 expr -> .expr > expr
 expr -> .expr EQ expr
+expr -> .expr NEQ expr
 expr -> .expr ^ expr
 expr -> .- expr
-expr -> .INT_CONST
-expr -> .BOOL_CONST
-expr -> .STR_CONST
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
 expr -> .id
-id -> .ID 
-transitions ->  {"}":67,"var":17,"function":18,"expr_stmt":19,"VAR":7,"FUNCTION":8,"expr":9,"RETURN":10,"id":11,"-":12,"INT_CONST":13,"BOOL_CONST":14,"STR_CONST":15,"ID":16}
+if_stmt -> .IF ( expr ) { body }
+if_stmt -> .IF ( expr ) { body } ELSE { body }
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"}":109,"var":27,"function":28,"expr_stmt":29,"VAR":7,"FUNCTION":8,";":9,"expr":10,"if_stmt":11,"RETURN":12,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"IF":20,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
 
-item set 67 
+item set 108 
+function -> FUNCTION id ( params ) { body .}
+body -> body .var
+body -> body .function
+body -> body .expr_stmt
+var -> .VAR id = expr ;
+function -> .FUNCTION id ( params ) { body }
+expr_stmt -> .;
+expr_stmt -> .expr ;
+expr_stmt -> .if_stmt
+expr_stmt -> .RETURN expr ;
+expr -> .id ( args )
+expr -> .expr + expr
+expr -> .expr - expr
+expr -> .expr * expr
+expr -> .expr / expr
+expr -> .expr < expr
+expr -> .expr LE expr
+expr -> .expr GE expr
+expr -> .expr > expr
+expr -> .expr EQ expr
+expr -> .expr NEQ expr
+expr -> .expr ^ expr
+expr -> .- expr
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
+expr -> .id
+if_stmt -> .IF ( expr ) { body }
+if_stmt -> .IF ( expr ) { body } ELSE { body }
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"}":110,"var":27,"function":28,"expr_stmt":29,"VAR":7,"FUNCTION":8,";":9,"expr":10,"if_stmt":11,"RETURN":12,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"IF":20,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
+
+item set 109 
+if_stmt -> IF ( expr ) { body } .
+if_stmt -> IF ( expr ) { body } .ELSE { body } 
+transitions ->  {"ELSE":111}
+
+item set 110 
 function -> FUNCTION id ( params ) { body } . 
 transitions ->  {}
-68 states.
+
+item set 111 
+if_stmt -> IF ( expr ) { body } ELSE .{ body } 
+transitions ->  {"{":112}
+
+item set 112 
+if_stmt -> IF ( expr ) { body } ELSE { .body }
+body -> .var
+body -> .body var
+body -> .error ;
+body -> .function
+body -> .body function
+body -> .expr_stmt
+body -> .body expr_stmt
+var -> .VAR id = expr ;
+function -> .FUNCTION id ( params ) { body }
+expr_stmt -> .;
+expr_stmt -> .expr ;
+expr_stmt -> .if_stmt
+expr_stmt -> .RETURN expr ;
+expr -> .id ( args )
+expr -> .expr + expr
+expr -> .expr - expr
+expr -> .expr * expr
+expr -> .expr / expr
+expr -> .expr < expr
+expr -> .expr LE expr
+expr -> .expr GE expr
+expr -> .expr > expr
+expr -> .expr EQ expr
+expr -> .expr NEQ expr
+expr -> .expr ^ expr
+expr -> .- expr
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
+expr -> .id
+if_stmt -> .IF ( expr ) { body }
+if_stmt -> .IF ( expr ) { body } ELSE { body }
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"body":113,"var":3,"error":4,"function":5,"expr_stmt":6,"VAR":7,"FUNCTION":8,";":9,"expr":10,"if_stmt":11,"RETURN":12,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"IF":20,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
+
+item set 113 
+if_stmt -> IF ( expr ) { body } ELSE { body .}
+body -> body .var
+body -> body .function
+body -> body .expr_stmt
+var -> .VAR id = expr ;
+function -> .FUNCTION id ( params ) { body }
+expr_stmt -> .;
+expr_stmt -> .expr ;
+expr_stmt -> .if_stmt
+expr_stmt -> .RETURN expr ;
+expr -> .id ( args )
+expr -> .expr + expr
+expr -> .expr - expr
+expr -> .expr * expr
+expr -> .expr / expr
+expr -> .expr < expr
+expr -> .expr LE expr
+expr -> .expr GE expr
+expr -> .expr > expr
+expr -> .expr EQ expr
+expr -> .expr NEQ expr
+expr -> .expr ^ expr
+expr -> .- expr
+expr -> .array
+expr -> .obj
+expr -> .int
+expr -> .bool
+expr -> .string
+expr -> .id
+if_stmt -> .IF ( expr ) { body }
+if_stmt -> .IF ( expr ) { body } ELSE { body }
+id -> .ID
+array -> .[ ]
+array -> .[ values ]
+obj -> .{ kv_pairs }
+obj -> .{ values }
+int -> .NUM_CONST
+bool -> .BOOL_CONST
+string -> .STR_CONST 
+transitions ->  {"}":114,"var":27,"function":28,"expr_stmt":29,"VAR":7,"FUNCTION":8,";":9,"expr":10,"if_stmt":11,"RETURN":12,"id":13,"-":14,"array":15,"obj":16,"int":17,"bool":18,"string":19,"IF":20,"ID":21,"[":22,"{":23,"NUM_CONST":24,"BOOL_CONST":25,"STR_CONST":26}
+
+item set 114 
+if_stmt -> IF ( expr ) { body } ELSE { body } . 
+transitions ->  {}
+115 states.
 Building lookahead grammar.
 Computing lookaheads.
 Building parse table.
